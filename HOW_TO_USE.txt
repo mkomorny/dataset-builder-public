@@ -1,0 +1,79 @@
+HOW TO USE: dataset-builder
+====================================
+
+PURPOSE
+  Turns any target folder of raw documents (PDFs, Markdown, TXT, manuals,
+  or research) into a production-grade, dual-access dataset. The resulting
+  dataset is optimized for both Producer Pal the APP (Live Actions Helper /
+  Genius) and AI Skills (producer-pal-genius, ai-database-browser, Claude,
+  Grok, Antigravity). Destination MUST be specified first before building.
+
+CAPABILITIES
+  - Enforce destination specification before building to protect file organization
+  - Extract text cleanly from PDFs (PyPDF / PyMuPDF), Markdown, TXT, JSON, and HTML
+  - Generate modular, categorized Markdown chapters under token limits (<15,000 chars)
+  - Create semantic ~500-word chunks with section anchors and keyword tags
+  - Build SQLite FTS5 database with Porter stemming and BM25 relevance ranking
+  - Export Apache Parquet (.parquet) and JSON Lines (_chunks.jsonl, _docs.jsonl)
+  - Generate a standalone executable search tool (search.py)
+  - Generate high-density Producer Pal App router table (INDEX.md) with:
+    * Decide First quick routing table
+    * Live Actions / Producer Pal capability matrix (Native vs Handoff)
+    * Real runnable Live Actions device and MIDI action blueprints
+    * Full categorized document catalog
+  - Generate schema documentation (SCHEMA.md) and overview guide (README.md)
+  - Automatically register new databases in ai-database-browser and master INDEX.md
+
+USE CASES
+  - "Turn this folder of plugin manuals into a dataset in B:\DATABASES"
+  - "Convert these sound design notes into an indexed database Producer Pal can read"
+  - "Take this music theory folder and build a dataset with SQLite FTS5 and INDEX.md"
+  - "Create a structured dataset from B:\Documents\TRAINING DOCS\NewFolder"
+  - "Add this new manual or research folder into an existing dataset without overwriting it"
+
+IDEAS
+  - Keep raw PDFs alongside the dataset so human and AI readers both have access
+  - Use --domain music for Ableton-specific action blueprints, or --domain general
+  - Pair with ai-database-browser to immediately search across all studio datasets
+  - Open the generated INDEX.md in Live Actions Helper to verify token navigation
+  - Use incremental addition (--add) whenever adding individual manuals or new release notes
+
+PROMPTS YOU CAN PASTE
+  /dataset-builder
+
+  Create a dataset from "B:\Documents\TRAINING DOCS\MyFolder". Put it in
+  "B:\DATABASES\Music_Audio\MyFolder".
+
+  /dataset-builder add "B:\Documents\TRAINING DOCS\NewManual" into "B:\DATABASES\Music_Audio\MyDataset"
+
+  Turn the documents in "C:\Users\<you>\Downloads\NewGearManuals" into a dataset
+  in "B:\DATABASES\Music_Audio\NewGear".
+
+  Build a dataset from this folder. Ask me for the destination first.
+
+  Convert these training docs into a Producer Pal compatible dataset with
+  SQLite FTS5, Parquet, and an INDEX.md router table.
+
+EXAMPLE FLOW
+  You:   /dataset-builder
+  Model: Please provide:
+         1. Destination directory (MANDATORY: must be specified first)
+         2. Target source folder containing your documents
+  You:   Source is B:\Documents\TRAINING DOCS\Modular Synths.
+         Destination is B:\DATABASES\Music_Audio\Modular Synths.
+  Model: [*] Validating paths...
+         [*] Scanning source: found 24 candidate files.
+         [+] Extracted 24 documents across 4 categories.
+         [+] Created 186 semantic chunks.
+         [*] Writing modular markdown chapters...
+         [+] SQLite FTS5 database written (modular_synths.db).
+         [+] Apache Parquet written (modular_synths.parquet).
+         [+] Created standalone search.py.
+         [+] Created INDEX.md with Live Actions blueprints.
+         [SUCCESS] Dataset ready for Producer Pal the APP and AI Skills!
+
+DEFAULT GOALS IF YOU DON'T NAME ONE
+  1. Halt and ask for the destination directory first
+  2. Extract all readable documents into categorized markdown files (<15,000 chars)
+  3. Build SQLite FTS5 database with Porter stemming + BM25 ranking
+  4. Generate Parquet, JSONL, search.py, and INDEX.md router table with action blocks

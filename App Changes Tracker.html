@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App Changes Tracker — dataset-builder</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --primary: #a855f7;
+      --accent: #c084fc;
+      --tag-feature: #10b981;
+      --tag-fix: #f59e0b;
+      --tag-doc: #6366f1;
+    }
+    body.light {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #9333ea;
+      --accent: #a855f7;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+    }
+    .title-group h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .title-group p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+    .theme-toggle {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .controls {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .search-box {
+      flex: 1;
+      min-width: 250px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.6rem 1rem;
+      border-radius: 0.5rem;
+      outline: none;
+    }
+    .filter-tabs {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .tab-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 0.5rem 0.85rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .tab-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .entry-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    .entry-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    .entry-version {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .entry-date {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    .tags {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.4rem;
+    }
+    .tag {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      font-weight: 600;
+    }
+    .tag-feature { background: rgba(16, 185, 129, 0.15); color: var(--tag-feature); }
+    .tag-fix { background: rgba(245, 158, 11, 0.15); color: var(--tag-fix); }
+    .tag-doc { background: rgba(99, 102, 241, 0.15); color: var(--tag-doc); }
+    .entry-summary {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+    .entry-changes {
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .entry-changes li {
+      position: relative;
+      padding-left: 1.25rem;
+      font-size: 0.925rem;
+      color: var(--text-muted);
+    }
+    .entry-changes li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="title-group">
+        <h1>App Changes Tracker</h1>
+        <p>dataset-builder — Dataset Builder Engine</p>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Mode</button>
+    </header>
+
+    <div class="controls">
+      <input type="text" id="searchBox" class="search-box" placeholder="Search changes, features, versions..." oninput="render()">
+      <div class="filter-tabs">
+        <button class="tab-btn active" onclick="setFilter('all')">All</button>
+        <button class="tab-btn" onclick="setFilter('feature')">Features</button>
+        <button class="tab-btn" onclick="setFilter('fix')">Fixes</button>
+        <button class="tab-btn" onclick="setFilter('doc')">Docs</button>
+      </div>
+    </div>
+
+    <div id="timeline" class="timeline"></div>
+  </div>
+
+  <script>
+    const ENTRIES = [
+      {
+        version: "v1.0.0",
+        date: "2026-09-24",
+        type: "feature",
+        summary: "Initial public/private release of Dataset Builder Engine.",
+        changes: [
+          "Turns collections of PDFs, manuals, and docs into dual-access searchable datasets.",
+          "SQLite FTS5 full-text indexing paired with Parquet and JSONL export formats.",
+          "Built-in search routing table generation (INDEX.md) and search.py helper script.",
+          "Enforces strict destination specification and coverage audits.",
+          "Tri-platform NTFS junctions connecting Claude, Grok, and Antigravity."
+]
+      }
+    ];
+
+    let currentFilter = 'all';
+
+    function toggleTheme() {
+      document.body.classList.toggle('light');
+    }
+
+    function setFilter(type) {
+      currentFilter = type;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.toLowerCase().includes(type));
+      });
+      render();
+    }
+
+    function render() {
+      const search = document.getElementById('searchBox').value.toLowerCase();
+      const container = document.getElementById('timeline');
+      container.innerHTML = '';
+
+      const filtered = ENTRIES.filter(entry => {
+        const matchesFilter = currentFilter === 'all' || entry.type === currentFilter;
+        const matchesSearch = entry.version.toLowerCase().includes(search) ||
+                              entry.summary.toLowerCase().includes(search) ||
+                              entry.changes.some(c => c.toLowerCase().includes(search));
+        return matchesFilter && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding:2rem;">No matching releases found.</p>';
+        return;
+      }
+
+      filtered.forEach(entry => {
+        const card = document.createElement('div');
+        card.className = 'entry-card';
+
+        const header = document.createElement('div');
+        header.className = 'entry-header';
+
+        const verGroup = document.createElement('div');
+        const ver = document.createElement('div');
+        ver.className = 'entry-version';
+        ver.textContent = entry.version;
+
+        const tags = document.createElement('div');
+        tags.className = 'tags';
+        const tag = document.createElement('span');
+        tag.className = `tag tag-${entry.type}`;
+        tag.textContent = entry.type.toUpperCase();
+        tags.appendChild(tag);
+
+        verGroup.appendChild(ver);
+        verGroup.appendChild(tags);
+
+        const date = document.createElement('div');
+        date.className = 'entry-date';
+        date.textContent = entry.date;
+
+        header.appendChild(verGroup);
+        header.appendChild(date);
+
+        const summary = document.createElement('div');
+        summary.className = 'entry-summary';
+        summary.textContent = entry.summary;
+
+        const ul = document.createElement('ul');
+        ul.className = 'entry-changes';
+        entry.changes.forEach(change => {
+          const li = document.createElement('li');
+          li.textContent = change;
+          ul.appendChild(li);
+        });
+
+        card.appendChild(header);
+        card.appendChild(summary);
+        card.appendChild(ul);
+        container.appendChild(card);
+      });
+    }
+
+    render();
+  </script>
+</body>
+</html>
